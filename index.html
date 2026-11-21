@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LauncherXos17 — by masshieb</title>
+    
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =====================================================================
+           VARIABEL & RESET DASAR (iOS DARK LIQUID GLASS THEME)
+           ===================================================================== */
+        :root {
+            --bg-primary: #06070a;
+            --glass-bg: rgba(255, 255, 255, 0.045);
+            --glass-bg-inner: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.13);
+            --glass-border-subtle: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.72);
+            --text-muted: rgba(255, 255, 255, 0.48);
+            --accent-blue: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* =====================================================================
+           LATAR BELAKANG CAHAYA AMBIENT (LIQUID ORBS)
+           ===================================================================== */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(95px);
+            opacity: 0.45;
+            animation: floatOrb 14s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.35), transparent 70%);
+            top: -80px;
+            left: -80px;
+        }
+
+        .orb-2 {
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.28), transparent 70%);
+            bottom: -100px;
+            right: -80px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.16), transparent 70%);
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(25px, -30px) scale(1.08); }
+        }
+
+        /* =====================================================================
+           KONTAINER & KARTU LIQUID GLASS
+           ===================================================================== */
+        .container {
+            width: 100%;
+            max-width: 460px;
+            z-index: 10;
+            animation: fadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .liquid-card {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 2rem 1.75rem;
+            box-shadow: 
+                0 28px 60px -15px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+            overflow: hidden;
+        }
+
+        /* Kilauan tepi atas kaca */
+        .liquid-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+        }
+
+        .inner-glass {
+            background: var(--glass-bg-inner);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 20px;
+            padding: 1rem 1.15rem;
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+        }
+
+        /* =====================================================================
+           HEADER & TIPOGRAFI
+           ===================================================================== */
+        .header {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .release-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: 0.9rem;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--accent-blue);
+            box-shadow: 0 0 8px var(--accent-blue);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(0.85); }
+        }
+
+        .main-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .sub-author {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent-blue);
+            margin-top: 0.25rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* =====================================================================
+           KARTU STATUS (LOCKED VS UNLOCKED)
+           ===================================================================== */
+        .view-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .status-box {
+            display: flex;
+            align-items: center;
+            gap: 0.95rem;
+        }
+
+        .status-box.locked {
+            background: rgba(251, 191, 36, 0.05);
+            border-color: rgba(251, 191, 36, 0.22);
+        }
+
+        .status-box.unlocked {
+            background: rgba(16, 185, 129, 0.07);
+            border-color: rgba(16, 185, 129, 0.28);
+        }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .status-box.locked .status-icon {
+            background: rgba(251, 191, 36, 0.14);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            color: var(--accent-amber);
+        }
+
+        .status-box.unlocked .status-icon {
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid rgba(16, 185, 129, 0.32);
+            color: var(--accent-emerald);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.75); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .status-content h2 {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pill-tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .pill-tag.amber {
+            background: rgba(251, 191, 36, 0.18);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .pill-tag.green {
+            background: rgba(16, 185, 129, 0.22);
+            color: #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-content p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            line-height: 1.45;
+        }
+
+        /* =====================================================================
+           TOMBOL PILL-SHAPED
+           ===================================================================== */
+        .btn-pill {
+            width: 100%;
+            padding: 0.95rem 1.4rem;
+            border-radius: 9999px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease, background 0.2s ease;
+            user-select: none;
+        }
+
+        .btn-pill:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-pill:active {
+            transform: scale(0.97);
+        }
+
+        /* Tombol Utama Putih Kaca (SociaBuzz) */
+        .btn-primary-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(226, 232, 240, 0.92) 100%);
+            color: #09090b;
+            box-shadow: 
+                0 12px 28px -6px rgba(255, 255, 255, 0.25),
+                inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary-glass:hover {
+            box-shadow: 
+                0 16px 34px -6px rgba(255, 255, 255, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        /* Tombol Sukses Emerald (Google Drive) */
+        .btn-success-glass {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            box-shadow: 
+                0 12px 28px -6px rgba(16, 185, 129, 0.42),
+                inset 0 1px 1px rgba(255, 255, 255, 0.35);
+        }
+
+        .btn-success-glass:hover {
+            box-shadow: 
+                0 16px 34px -6px rgba(16, 185, 129, 0.55),
+                inset 0 1px 1px rgba(255, 255, 255, 0.45);
+        }
+
+        /* Tombol Sekunder Kaca Transparan */
+        .btn-secondary-glass {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.8rem;
+            padding: 0.72rem 1.2rem;
+        }
+
+        .btn-secondary-glass:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: var(--text-primary);
+        }
+
+        /* =====================================================================
+           PANDUAN LANGKAH
+           ===================================================================== */
+        .guide-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .guide-list {
+            padding-left: 1.15rem;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .guide-list strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* =====================================================================
+           FOOTER & PANEL SIMULASI PEMILIK
+           ===================================================================== */
+        .footer {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .owner-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 22px;
+            padding: 0.95rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .owner-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .owner-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .preview-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-mini {
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-mini:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: var(--text-primary);
+        }
+
+        .btn-mini.danger {
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.25);
+            color: #fda4af;
+        }
+
+        .btn-mini.danger:hover {
+            background: rgba(244, 63, 94, 0.22);
+        }
+
+        .redirect-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.5rem 0.65rem;
+        }
+
+        .redirect-url-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.69rem;
+            color: #7dd3fc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-copy-url {
+            flex-shrink: 0;
+            padding: 0.3rem 0.65rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.68rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-copy-url:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .redirect-hint {
+            font-size: 0.69rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .copyright strong {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* =====================================================================
+           TOAST NOTIFIKASI MELAYANG
+           ===================================================================== */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translate(-50%, 16px);
+            background: rgba(18, 20, 28, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.65);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @media (max-width: 420px) {
+            .liquid-card {
+                padding: 1.65rem 1.25rem;
+                border-radius: 26px;
+            }
+            .main-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Efek Cahaya Ambient Latar Belakang -->
+    <div class="ambient-bg" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main class="container">
+        <!-- Kartu Utama Liquid Glass -->
+        <section class="liquid-card">
+            
+            <!-- Header Proyek -->
+            <header class="header">
+                <div class="release-badge">
+                    <span class="badge-dot"></span>
+                    <span>iOS Mod Edition &bull; XOS 17</span>
+                </div>
+                <h1 class="main-title">LauncherXos17</h1>
+                <p class="sub-author">by masshieb</p>
+                <p class="description">
+                    Peluncur sistem dengan animasi transisi mulus ala iOS, antarmuka modern bersih, serta optimalisasi performa ringan untuk perangkat harian.
+                </p>
+            </header>
+
+            <!-- ===============================================================
+                 MODE 1: TAMPILAN TERKUNCI (LOCKED STATE - DEFAULT)
+                 =============================================================== -->
+            <div id="locked-view" class="view-section">
+                <div class="inner-glass status-box locked">
+                    <div class="status-icon" aria-hidden="true">
+                        <!-- Ikon Gembok SVG Inline -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="3" ry="3"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <div class="status-content">
+                        <h2>
+                            Akses Terkunci
+                            <span class="pill-tag amber">Locked</span>
+                        </h2>
+                        <p>
+                            Akses file memerlukan dukungan melalui SociaBuzz. Tautan unduhan akan terbuka otomatis setelah pembayaran berhasil.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tombol Utama SociaBuzz -->
+                <a id="sociabuzz-link" href="https://sociabuzz.com/masshieb_01/donate" target="_blank" rel="noopener noreferrer" class="btn-pill btn-primary-glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#e11d48" aria-hidden="true">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span>Dukung &amp; Bayar via SociaBuzz</span>
+                </a>
+
+                <!-- Panduan Singkat -->
+                <div class="inner-glass">
+                    <p class="guide-title">Cara Membuka Unduhan Otomatis</p>
+                    <ol class="guide-list">
+                        <li>Tekan tombol <strong>Dukung &amp; Bayar via SociaBuzz</strong> di atas.</li>
+                        <li>Selesaikan proses pembayaran di halaman <strong>SociaBuzz</strong>.</li>
+                        <li>Setelah transaksi berhasil, kamu akan diarahkan kembali ke halaman ini dan tombol unduhan langsung terbuka.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===============================================================
+                 MODE 2: TAMPILAN TERBUKA (UNLOCKED STATE)
+                 =============================================================== -->
+            <div id="unlocked-view" class="view-section hidden">
+                <div class="inner-glass status-box unlocked">
+                    <div class="status-icon" aria-hidden="true">
+                        <!-- Ikon Centang Sukses SVG Inline -->
+                        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <div class="status-content">
+                        <h2>
+                            Pembayaran Berhasil!
+                            <span class="pill-tag green">Unlocked</span>
+                        </h2>
+                        <p>
+                            Akses File Terbuka. Terima kasih telah mendukung karya <strong>masshieb</strong>, silakan unduh file di bawah ini.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tombol Utama Download Google Drive -->
+                <a id="gdrive-link" href="https://drive.google.com/file/d/1Ycq1ok8WGOvP4bOcpFtSQ4aMc9wRge8i/view?usp=drivesdk" target="_blank" rel="noopener noreferrer" class="btn-pill btn-success-glass">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Download LauncherXos17 (Google Drive)</span>
+                </a>
+
+                <!-- Tombol Salin Link Drive -->
+                <button type="button" onclick="copyDriveUrl()" class="btn-pill btn-secondary-glass">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span id="copy-drive-label">Salin Tautan Google Drive</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ===================================================================
+             FOOTER: PANEL SIMULASI & PANDUAN PEMILIK
+             =================================================================== -->
+        <footer class="footer">
+            <div class="owner-panel">
+                <div class="owner-header">
+                    <span class="owner-label">Panel Simulasi &amp; Pemilik</span>
+                    <div class="preview-controls">
+                        <button type="button" id="toggle-mode-btn" onclick="togglePreviewMode()" class="btn-mini">
+                            Preview Mode Terbuka
+                        </button>
+                        <button type="button" id="reset-storage-btn" onclick="resetUnlockStorage()" class="btn-mini danger hidden">
+                            Reset Kunci
+                        </button>
+                    </div>
+                </div>
+
+                <div class="redirect-box">
+                    <span id="redirect-url-display" class="redirect-url-text">https://username.github.io/?status=paid</span>
+                    <button type="button" onclick="copyRedirectUrl()" class="btn-copy-url">Salin URL</button>
+                </div>
+
+                <p class="redirect-hint">
+                    Tempelkan URL di atas ke pengaturan <strong>Thank You / Redirect URL</strong> di dashboard SociaBuzz agar pembeli otomatis diarahkan ke mode terbuka.
+                </p>
+            </div>
+
+            <p class="copyright">
+                &copy; <span id="year"></span> <strong>LauncherXos17</strong> &bull; by <strong>masshieb</strong>
+            </p>
+        </footer>
+    </main>
+
+    <!-- Notifikasi Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        /**
+         * Konfigurasi Utama LauncherXos17 Download Gate
+         */
+        const CONFIG = {
+            sociabuzzUrl: "https://sociabuzz.com/masshieb_01/donate",
+            googleDriveUrl: "https://drive.google.com/file/d/1Ycq1ok8WGOvP4bOcpFtSQ4aMc9wRge8i/view?usp=drivesdk",
+            storageKey: "launcherxos17_masshieb_access_unlocked"
+        };
+
+        let currentUnlocked = false;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Set tahun footer & tautan tombol
+            document.getElementById("year").textContent = new Date().getFullYear();
+            document.getElementById("sociabuzz-link").href = CONFIG.sociabuzzUrl;
+            document.getElementById("gdrive-link").href = CONFIG.googleDriveUrl;
+
+            // Tampilkan URL halaman saat ini + ?status=paid
+            populateRedirectUrl();
+
+            // Periksa status kunci dari parameter URL atau localStorage
+            evaluateAccessState();
+        });
+
+        /**
+         * Mengisi kotak salin cepat dengan URL saat ini + ?status=paid
+         */
+        function populateRedirectUrl() {
+            const displayEl = document.getElementById("redirect-url-display");
+            const { protocol, host, pathname } = window.location;
+
+            if (protocol && protocol.startsWith("http") && host) {
+                displayEl.textContent = `${protocol}//${host}${pathname}?status=paid`;
+            } else {
+                displayEl.textContent = "https://masshieb.github.io/launcherxos17/?status=paid";
+            }
+        }
+
+        /**
+         * Mengecek apakah parameter ?status=paid atau ?unlocked=true ada,
+         * atau apakah akses sudah tersimpan di localStorage.
+         */
+        function evaluateAccessState() {
+            const params = new URLSearchParams(window.location.search);
+            const isPaidParam = params.get("status") === "paid";
+            const isUnlockedParam = params.get("unlocked") === "true";
+
+            let savedUnlock = false;
+            try {
+                savedUnlock = localStorage.getItem(CONFIG.storageKey) === "true";
+            } catch (e) {
+                // Abaikan jika penyimpanan diblokir browser
+            }
+
+            if (isPaidParam || isUnlockedParam || savedUnlock) {
+                try {
+                    localStorage.setItem(CONFIG.storageKey, "true");
+                } catch (e) {}
+
+                // Bersihkan query string dari URL bar agar rapi
+                if (isPaidParam || isUnlockedParam) {
+                    const cleanUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+
+                updateUIState(true);
+            } else {
+                updateUIState(false);
+            }
+        }
+
+        /**
+         * Mengubah tampilan antara Mode Terkunci dan Mode Terbuka
+         */
+        function updateUIState(unlocked) {
+            currentUnlocked = unlocked;
+            const lockedView = document.getElementById("locked-view");
+            const unlockedView = document.getElementById("unlocked-view");
+            const toggleBtn = document.getElementById("toggle-mode-btn");
+            const resetBtn = document.getElementById("reset-storage-btn");
+
+            if (unlocked) {
+                lockedView.classList.add("hidden");
+                unlockedView.classList.remove("hidden");
+                toggleBtn.textContent = "Preview Mode Terkunci";
+                resetBtn.classList.remove("hidden");
+            } else {
+                unlockedView.classList.add("hidden");
+                lockedView.classList.remove("hidden");
+                toggleBtn.textContent = "Preview Mode Terbuka";
+                resetBtn.classList.add("hidden");
+            }
+        }
+
+        /**
+         * Tombol Simulasi untuk pemilik menguji Mode Terkunci vs Mode Terbuka
+         */
+        function togglePreviewMode() {
+            const nextState = !currentUnlocked;
+            updateUIState(nextState);
+            showToast(nextState ? "Simulasi: Mode Terbuka" : "Simulasi: Mode Terkunci");
+        }
+
+        /**
+         * Menghapus status terbuka yang tersimpan di localStorage
+         */
+        function resetUnlockStorage() {
+            try {
+                localStorage.removeItem(CONFIG.storageKey);
+            } catch (e) {}
+            updateUIState(false);
+            showToast("Status akses dikunci kembali.");
+        }
+
+        /**
+         * Menyalin URL Redirect SociaBuzz ke clipboard
+         */
+        function copyRedirectUrl() {
+            const urlText = document.getElementById("redirect-url-display").textContent.trim();
+            copyToClipboard(urlText, () => {
+                showToast("URL Redirect SociaBuzz berhasil disalin!");
+            });
+        }
+
+        /**
+         * Menyalin URL Google Drive ke clipboard
+         */
+        function copyDriveUrl() {
+            copyToClipboard(CONFIG.googleDriveUrl, () => {
+                const label = document.getElementById("copy-drive-label");
+                label.textContent = "Tautan Tersalin!";
+                showToast("Tautan Google Drive disalin!");
+                setTimeout(() => {
+                    label.textContent = "Salin Tautan Google Drive";
+                }, 2200);
+            });
+        }
+
+        /**
+         * Fungsi salin teks yang kompatibel di berbagai lingkungan browser & iframe
+         */
+        function copyToClipboard(text, callback) {
+            const input = document.createElement("input");
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            input.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand("copy");
+                if (callback) callback();
+            } catch (err) {
+                showToast("Gagal menyalin tautan.");
+            }
+
+            document.body.removeChild(input);
+        }
+
+        /**
+         * Menampilkan notifikasi toast halus di bagian bawah layar
+         */
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2400);
+        }
+    </script>
+</body>
+</html>
